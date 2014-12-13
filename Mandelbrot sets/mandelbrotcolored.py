@@ -55,8 +55,8 @@ def main():
             imaginary = vert_map(y)
             c = complex(real, imaginary)
 
-            inSet, iterations = is_in_mandelbrot(c, depth)
-            if inSet:
+            in_set, iterations = is_in_mandelbrot(c, depth)
+            if in_set:
                 pixels[x, y] = (0,0,0)
             else:
                 color = get_color(iterations, depth)
