@@ -1,42 +1,45 @@
 from PIL import Image
 from colorsys import hsv_to_rgb
+from math import log10
 
-def getColor(i, depth):
+def get_color(i, depth):
 
-    h = (float(i) / depth) * 360
-    r, g, b = hsv_to_rgb(h/360, 1., 1.)
+    h = (float(i) / depth)
+    r, g, b = hsv_to_rgb(h, 1., 1.)
 
     return (int(r * 255), int(g * 255), int(b * 255))
 
 
 def remap(o1, o2, n1, n2):
 
-    oldRange = o1 - o2
-    newRange = n1 - n2
-    ratio = newRange / oldRange
+    old_range = o1 - o2
+    new_range = n1 - n2
+    ratio = new_range / old_range
 
-    return lambda x : (x - o1) * ratio + n1
+    return lambda x: (x - o1) * ratio + n1
 
-def isInMandelbrot(c, depth):
+def is_in_mandelbrot(c, depth):
 
     z = 0
 
     for i in range(0, depth):
 
         z = z**2 + c
+
         if abs(z) >= 2:
+            i = i + 1 - log10(log10(abs(z))) / log10(2)
             return False, i
 
     return True, i
 
 def main():
 
-    height = 1000 #int(raw_input("Height: "))
-    width = 1000 #int(raw_input("Width: "))
-    depth = 25 #int(raw_input("Depth/iterations: "))
+    height = int(raw_input("Height: "))
+    width = int(raw_input("Width: "))
+    depth = int(raw_input("Depth/iterations: "))
 
-    horizontalMap = remap(0, width, -2.0, 1.5)
-    verticalMap = remap(0, height, -1.5, 1.5)
+    horiz_map = remap(0, width, -2.0, 1.5)
+    vert_map = remap(0, height, -1.5, 1.5)
 
     image = Image.new("RGB", (width, height), "#FFFFFF")
     pixels = image.load()
@@ -45,18 +48,18 @@ def main():
 
     for x in range(0, width):
 
-        real = horizontalMap(x)
+        real = horiz_map(x)
 
         for y in range(0, height):
 
-            imaginary = verticalMap(y)
+            imaginary = vert_map(y)
             c = complex(real, imaginary)
 
-            inSet, iterations = isInMandelbrot(c, depth)
+            inSet, iterations = is_in_mandelbrot(c, depth)
             if inSet:
                 pixels[x, y] = (0,0,0)
             else:
-                color = getColor(iterations, depth)
+                color = get_color(iterations, depth)
                 pixels[x, y] = color
 
 
